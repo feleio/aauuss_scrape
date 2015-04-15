@@ -1,12 +1,15 @@
 import MySQLdb
 from datetime import datetime
 
+import logger
+
 db = MySQLdb.connect(	host='localhost',
 						port=33060,
 						user='homestead',
 						passwd='secret',
 						db='aauuss',
-						charset='utf8')
+						charset='utf8',
+						use_unicode=True)
 cursor = db.cursor()
 
 def set_time_zone(time_zone_str):
@@ -16,39 +19,30 @@ def set_time_zone(time_zone_str):
 def is_post_exist(postTitle, author=None):
 	global cursor
 	if author != None:
-		sql = "SELECT EXISTS( SELECT 1  FROM posts WHERE title = '%s' AND author = '%s')" % (postTitle, author)
+		sql = "SELECT EXISTS( SELECT 1  FROM posts WHERE title = `%s` AND author = `%s`)" % (postTitle, author)
 	else:
-		sql = "SELECT EXISTS( SELECT 1  FROM posts WHERE title = '%s')" % postTitle
+		sql = "SELECT EXISTS( SELECT 1  FROM posts WHERE title = `%s`)" % postTitle
 	cursor.execute(sql)
 	return cursor.fetchone()[0]
 
 def add_post(title, content, url, author, sourceId, postedAt ):
 	global cursor
-	values = (title, content, url, author, sourceId, postedAt.strftime('%Y-%m-%d %H:%M:%S'))
+	values = (	unicode(title), 
+				unicode(content), 
+				unicode(url), 
+				unicode(author),
+				sourceId, 
+				postedAt.strftime('%Y-%m-%d %H:%M:%S'))
 	sql = 	u"INSERT INTO posts (title,content,url,author,source_id,posted_at,created_at,updated_at) "\
-			"VALUES ('%s','%s','%s','%s',%d,'%s',now(),now())" % values
+			"VALUES (%s,%s,%s,%s,%s,%s,now(),now())"
 
 	try:
-		cursor.execute(sql)
+		cursor.execute(sql, values)
 		db.commit()
-		return True
+		return cursor.lastrowid
 	except:
 		db.rollback()
-		return False
-
-def add_post(title, content, url, author, sourceId, postedAt ):
-	global cursor
-	values = (title, content, url, author, sourceId, postedAt.strftime('%Y-%m-%d %H:%M:%S'))
-	sql = 	u"INSERT INTO posts (title,content,url,author,source_id,posted_at,created_at,updated_at) "\
-			"VALUES ('%s','%s','%s','%s',%d,'%s',now(),now())" % values
-
-	try:
-		cursor.execute(sql)
-		db.commit()
-		return True
-	except:
-		db.rollback()
-		return False
+		raise
 
 
 def get_sources(scraper_id):
@@ -69,3 +63,23 @@ def get_latest_time(source_id):
 	else:
 		return None
 
+def add_post_tag(post_id, tag_id):
+	global cursor
+	values = (post_id, tag_id)
+	sql = 	u"INSERT INTO post_tag (post_id,tag_id) "\
+			"VALUES (%d,%d)" % values
+
+	try:
+		cursor.execute(sql)
+		db.commit()
+		return True
+	except:
+		db.rollback()
+		return False
+
+def get_source_tags(source_id):
+	global cursor
+	sql = "SELECT tag_id FROM source_tag WHERE source_id = %d" % source_id
+	cursor.execute(sql)
+	results = cursor.fetchall()
+	return [src[0] for src in results]

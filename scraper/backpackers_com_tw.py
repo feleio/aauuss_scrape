@@ -35,8 +35,8 @@ class Scraper:
 					link = item.link.string
 					content = item.description.string
 					author = ''
-
-					dbagent.add_post(title, content, link, author, src_id, postedAt)
+					new_post_id = dbagent.add_post(title, content, link, author, src_id, postedAt)
+					self._add_tags(src_id, new_post_id)
 					scape_count += 1
 			else:
 				break
@@ -49,10 +49,15 @@ class Scraper:
 		result = prog.match(url)
 		return result.group(1)
 
+	def _add_tags(self, source_id, post_id):
+		for tag_id in dbagent.get_source_tags(source_id):
+			dbagent.add_post_tag(post_id, tag_id)
+
 
 	def scrape(self):
 		for src in dbagent.get_sources(self._scraper_id):
 			self._scrape(src['id'], src['url'])
+		
 		#print(self._sources())
 		#for src in self._sources():
 		#	self._scrape(src)
