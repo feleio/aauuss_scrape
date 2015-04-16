@@ -16,25 +16,23 @@ def set_time_zone(time_zone_str):
 	global db
 	db.time_zone = time_zone_str
 
-def is_post_exist(postTitle, author=None):
+def is_post_exist(src_id, remote_id):
 	global cursor
-	if author != None:
-		sql = "SELECT EXISTS( SELECT 1  FROM posts WHERE title = `%s` AND author = `%s`)" % (postTitle, author)
-	else:
-		sql = "SELECT EXISTS( SELECT 1  FROM posts WHERE title = `%s`)" % postTitle
-	cursor.execute(sql)
+	sql = "SELECT EXISTS( SELECT 1 FROM posts WHERE source_id = %s AND remote_id = %s)"
+	cursor.execute(sql, (src_id, remote_id))
 	return cursor.fetchone()[0]
-
-def add_post(title, content, url, author, sourceId, postedAt ):
+	
+def add_post(title, content, url, author, sourceId, remote_id, postedAt, ):
 	global cursor
 	values = (	unicode(title), 
 				unicode(content), 
 				unicode(url), 
 				unicode(author),
 				sourceId, 
+				remote_id,
 				postedAt.strftime('%Y-%m-%d %H:%M:%S'))
-	sql = 	u"INSERT INTO posts (title,content,url,author,source_id,posted_at,created_at,updated_at) "\
-			"VALUES (%s,%s,%s,%s,%s,%s,now(),now())"
+	sql = 	u"INSERT INTO posts (title,content,url,author,source_id,remote_id,posted_at,created_at,updated_at) "\
+			"VALUES (%s,%s,%s,%s,%s,%s,%s,now(),now())"
 
 	try:
 		cursor.execute(sql, values)

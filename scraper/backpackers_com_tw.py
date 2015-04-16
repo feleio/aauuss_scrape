@@ -15,7 +15,7 @@ class Scraper:
 		dbagent.set_time_zone('+00:00')
 
 	def _scrape(self, src_id, src_url):
-		xml_doc = url.get(src_url)
+		xml_doc = url.get(src_url).read().decode('utf-8','ignore')
 		soup = BeautifulSoup(xml_doc, "xml")
 
 		latest = dbagent.get_latest_time(src_id)
@@ -35,7 +35,8 @@ class Scraper:
 					link = item.link.string
 					content = item.description.string
 					author = ''
-					new_post_id = dbagent.add_post(title, content, link, author, src_id, postedAt)
+					remote_id = 0
+					new_post_id = dbagent.add_post(title, content, link, author, src_id, remote_id, postedAt)
 					self._add_tags(src_id, new_post_id)
 					scape_count += 1
 			else:
@@ -57,6 +58,8 @@ class Scraper:
 	def scrape(self):
 		for src in dbagent.get_sources(self._scraper_id):
 			self._scrape(src['id'], src['url'])
+
+		#self._scrape(27, 'http://www.backpackers.com.tw/forum/external.php?type=RSS2&amp;forumids=309')
 		
 		#print(self._sources())
 		#for src in self._sources():
