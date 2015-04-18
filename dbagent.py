@@ -2,14 +2,23 @@ import MySQLdb
 from datetime import datetime
 
 import logger
+import socket
 
-db = MySQLdb.connect(	host='localhost',
-						port=33060,
-						user='homestead',
-						passwd='secret',
-						db='aauuss',
-						charset='utf8',
-						use_unicode=True)
+if(socket.gethostname() == "homestead"):
+	db = MySQLdb.connect(	host='localhost',
+							port=33060,
+							user='homestead',
+							passwd='secret',
+							db='aauuss',
+							charset='utf8',
+							use_unicode=True)
+else:
+	db = MySQLdb.connect(	host='localhost',
+							user='root',
+							passwd='zxadzxad',
+							db='aauuss',
+							charset='utf8',
+							use_unicode=True)
 cursor = db.cursor()
 
 def set_time_zone(time_zone_str):
