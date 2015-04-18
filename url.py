@@ -3,7 +3,7 @@ import socket
 
 
 def get(url):
-    if(socket.gethostname() == "homestead"):
+    if(socket.gethostname() != "homestead"):
         proxy = urllib2.ProxyHandler({'http':'111.1.36.163:80'})
         opener = urllib2.build_opener(proxy)
         urllib2.install_opener(opener)
