@@ -1,0 +1,1 @@
+ALTER TABLE aauuss.posts MODIFY COLUMN title VARCHAR(150)  CHARACTER SET utf8 COLLATE utf8_general_ci;

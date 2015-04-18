@@ -1,7 +1,7 @@
 import codecs
 from datetime import datetime
 
-log_file_name = 'scrapper.log'
+log_file_name = 'logs/scrapper.log'
 
 def log(log_type, str):
 	with codecs.open(log_file_name, 'a', encoding='utf8') as log:
