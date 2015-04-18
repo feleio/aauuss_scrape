@@ -34,16 +34,20 @@ class Scraper:
 			        title = splits[0]
 			        content = splits[1] if (len(splits) > 1) else ''
 			    else:
-			        title = ''
+			        title = '(請點連結閱讀內容)'
 			        content = ''
 			    title = title[:30] if (len(title) > 30) else title
 			    
 			    link = "https://www.facebook.com/"+post['id']
 			    author = post['from']['name']
 			    posted_at = datetime.strptime(post['created_time'],'%Y-%m-%dT%H:%M:%S+0000')
-			    new_post_id = dbagent.add_post(title, content, link, author, src_id, remote_id, posted_at)
-			    self._add_tags(src_id, new_post_id)
-			    scape_count += 1
+			    try:
+				    new_post_id = dbagent.add_post(title, content, link, author, src_id, remote_id, posted_at)
+				    self._add_tags(src_id, new_post_id)
+				    scape_count += 1
+			    except Exception as e:
+						logger.log(	'error', 'scraper(%d), src(%d), id(%s): %s' 
+							% (self._scraper_id, src_id, self._get_post_id(link), e))
 
 		logger.log(	'info', 'scraper(%d), src(%d): %d posts saved' 
 					% (self._scraper_id, src_id, scape_count))

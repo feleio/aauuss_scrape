@@ -36,9 +36,13 @@ class Scraper:
 					content = item.description.string
 					author = ''
 					remote_id = 0
-					new_post_id = dbagent.add_post(title, content, link, author, src_id, remote_id, postedAt)
-					self._add_tags(src_id, new_post_id)
-					scape_count += 1
+					try:
+						new_post_id = dbagent.add_post(title, content, link, author, src_id, remote_id, postedAt)
+						self._add_tags(src_id, new_post_id)
+						scape_count += 1
+					except Exception as e:
+						logger.log(	'error', 'scraper(%d), src(%d), id(%s): %s' 
+							% (self._scraper_id, src_id, self._get_post_id(link), e))
 			else:
 				break
 
