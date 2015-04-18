@@ -48,7 +48,7 @@ class Scraper:
 					scape_count += 1
 			    except Exception as e:
 						logger.log(	'error', 'scraper(%d), src(%d), id(%s): %s' 
-							% (self._scraper_id, src_id, self._get_post_id(link), e))
+							% (self._scraper_id, src_id, post['id'], e))
 
 		logger.log(	'info', 'scraper(%d), src(%d): %d posts saved' 
 					% (self._scraper_id, src_id, scape_count))

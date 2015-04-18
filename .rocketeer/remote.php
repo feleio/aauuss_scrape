@@ -30,7 +30,7 @@ return array(
 	// Use this to list folders that need to keep their state, like
 	// user uploaded data, file-based databases, etc.
 	'shared'         => array(
-		'logs',
+		'log',
 	),
 
 	// Execution
