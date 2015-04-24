@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
-import logger
+import logging
 import traceback
 
 from bs4 import BeautifulSoup
@@ -39,22 +39,22 @@ class Scraper:
                             content = item.description.string
                             author = ''
                             remote_id = 0
-                            print ('scraper(%d), src(%d): id: %s' % (self._scraper_id, src_id, self._get_post_id(link)))
+                            #print ('scraper(%d), src(%d): id: %s' % (self._scraper_id, src_id, self._get_post_id(link)))
                             new_post_id = dbagent.add_post(title, content, link, author, src_id, remote_id, postedAt)
                             self._add_tags(src_id, new_post_id)
                             scape_count += 1
                         except Exception, err:
-                            logger.log(    'error', 'scraper(%d), src(%d), id(%s):\n%s' 
-                                % (self._scraper_id, src_id, self._get_post_id(link), traceback.format_exc()))
+                            logging.error( 'scraper(%d), src(%d), id(%s):\n%s',
+                                self._scraper_id, src_id, self._get_post_id(link), traceback.format_exc())
                 else:
                     break
-
-            logger.log(    'info', 'scraper(%d), src(%d): %d posts saved' 
-                        % (self._scraper_id, src_id, scape_count))
+            if ( scape_count > 0 ):
+                logging.info( 'scraper(%d), src(%d): %d posts saved' ,
+                            self._scraper_id, src_id, scape_count )
 
         except Exception, err:
-            logger.log(    'error', 'scraper(%d), src(%d):\n%s' 
-                % (self._scraper_id, src_id, traceback.format_exc()))
+            logging.error( 'scraper(%d), src(%d):\n%s',
+                self._scraper_id, src_id, traceback.format_exc())
 
     def _get_post_id(self, url):
         prog = re.compile('^.+=(\d+)$')

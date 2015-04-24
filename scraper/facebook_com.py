@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
+import logging
 import traceback
 import simplejson
 
@@ -8,12 +9,11 @@ from datetime import datetime
 #my modules
 import dbagent
 import url
-import logger
 
 class Scraper:
     def __init__(self):
         self._scraper_id = 2
-        self._token = "CAALN1209ZAmgBAMpVBq7m8yDo7hj5ThZCZC67IVUUoq1ZBOoOOe4MNETUD1w38uNDzUzZCu2nTfKu87rLwPwRVgwNrtl7hZC6O5VFvv622PWDxeiEOl73p5TujuyvWzKo3bYRCnTZAnIW0PWZBGmi2Oc79S2xvinKJBfcNFZBKzMuBn5hvTROMUDl"
+        self._token = "CAALN1209ZAmgBAJo0S4ZAGhb4obyPAuft8O4DehKmaELyEbJ5QnAvqpoou9nGlZBvd15wFEhti7z1E9kZCzE4gHE8GQusq4HXUgRaZAWfZBImuWHdLZBzyw6LJwVDEH8eqL0ADZBZBo8gVj99STZAnTWaqxlPZAP8oR2jRdxBxXqZCdzojE6BtZA6k7ST"
         dbagent.set_time_zone('+00:00')
 
     def _scrape(self, src_id, src_remote_id):
@@ -44,19 +44,20 @@ class Scraper:
                         link = "https://www.facebook.com/"+post['id']
                         author = post['from']['name']
                         posted_at = datetime.strptime(post['created_time'],'%Y-%m-%dT%H:%M:%S+0000')
-                        print ('scraper(%d), src(%d): id: %s' % (self._scraper_id, src_id, remote_id))
+                        #print ('scraper(%d), src(%d): id: %s' % (self._scraper_id, src_id, remote_id))
                         new_post_id = dbagent.add_post(title, content, link, author, src_id, remote_id, posted_at)
                         self._add_tags(src_id, new_post_id)
                         scape_count += 1
                     except Exception, err:
-                        logger.log(    'error', 'scraper(%d), src(%d), id(%s):\n%s' 
-                                    % (self._scraper_id, src_id, remote_id, traceback.format_exc()))
+                        logging.error( 'scraper(%d), src(%d), id(%s):\n%s',
+                                    self._scraper_id, src_id, remote_id, traceback.format_exc())
 
-            logger.log(    'info', 'scraper(%d), src(%d): %d posts saved' 
-                        % (self._scraper_id, src_id, scape_count))
+            if ( scape_count > 0 ):
+                logging.info( 'scraper(%d), src(%d): %d posts saved', 
+                        self._scraper_id, src_id, scape_count)
         except Exception, err:
-            logger.log(    'error', 'scraper(%d), src(%d):\n%s' 
-                % (self._scraper_id, src_id, traceback.format_exc()))
+            logging.error( 'scraper(%d), src(%d):\n%s' ,
+                        self._scraper_id, src_id, traceback.format_exc())
 
     # def _get_post_id(self, url):
     #     prog = re.compile('^.+=(\d+)$')

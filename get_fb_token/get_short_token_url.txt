@@ -1,0 +1,1 @@
+https://www.facebook.com/dialog/oauth?client_id=789275087824488&response_type=token&redirect_uri=https://www.facebook.com/connect/login_success.html

@@ -13,5 +13,4 @@ def get(url):
             'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.115 Safari/537.36'}
     req = urllib2.Request(url, headers=hdr)
     response = urllib2.urlopen(req)
-    #print 'ok'
     return response
