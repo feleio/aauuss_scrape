@@ -17,7 +17,7 @@ class Scraper:
 
     def _scrape(self, src_id, src_url):
         try:
-            logging.debug( 'scraper(%d), src(%d) start: 0 posts saved' ,
+            logging.debug( 'scraper(%d), src(%d) start:' ,
                             self._scraper_id, src_id )
             xml_doc = url.get(src_url).read().decode('utf-8','ignore')
             soup = BeautifulSoup(xml_doc, "xml")

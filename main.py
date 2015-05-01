@@ -2,10 +2,11 @@ from scraper import *
 import time
 import datetime
 import logging
+import sys
 while 1:
 
     #log file setup
-    loglevel = arg[1]
+    loglevel = sys.argv[1]
     numeric_level = getattr(logging, loglevel.upper(), None)
     if not isinstance(numeric_level, int):
         raise ValueError('Invalid log level: %s' % loglevel)

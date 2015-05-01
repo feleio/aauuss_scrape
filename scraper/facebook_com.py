@@ -18,6 +18,8 @@ class Scraper:
 
     def _scrape(self, src_id, src_remote_id):
         try:
+            logging.debug( 'scraper(%d), src(%d) start:' ,
+                            self._scraper_id, src_id )
             src_url = ("https://graph.facebook.com/v2.3/%s/feed?access_token=%s" 
                     % (src_remote_id, self._token))
 
