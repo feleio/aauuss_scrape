@@ -94,9 +94,9 @@ def get_source_tags(source_id):
 def source_error(source_id):
 	global cursor
 	sql = "UPDATE sources SET error_count = error_count + 1 WHERE id = %s" 
-
+	values = ( source_id )
 	try:
-		cursor.execute(sql, source_id)
+		cursor.execute(sql, values)
 		db.commit()
 		return cursor.lastrowid
 	except:
