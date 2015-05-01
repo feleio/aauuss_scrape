@@ -5,6 +5,11 @@ import logging
 while 1:
 
     #log file setup
+    loglevel = arg[1]
+    numeric_level = getattr(logging, loglevel.upper(), None)
+    if not isinstance(numeric_level, int):
+        raise ValueError('Invalid log level: %s' % loglevel)
+
     now = datetime.datetime.utcnow()
     log_file_name = now.strftime('%Y%m%d')
 
@@ -16,7 +21,7 @@ while 1:
     for hdlr in log.handlers:  # remove all old handlers
         log.removeHandler(hdlr)
     log.addHandler(fileh)      # set the new handler
-    #log.setLevel(logging.INFO)
+    log.setLevel(numeric_level)
 
     #scrape
 
