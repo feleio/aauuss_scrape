@@ -23,9 +23,9 @@ while 1:
     logging.info('Scraper(%d) started scraping', 1)
     s = backpackers_com_tw.Scraper()
     s.scrape()
-    logging.info('Scraper(%d) started scraping', 1)
+    logging.info('Scraper(%d) stopped scraping', 1)
 
-    logging.info('Scraper(%d) stopped scraping', 2)
+    logging.info('Scraper(%d) started scraping', 2)
     s = facebook_com.Scraper()
     s.scrape()
     logging.info('Scraper(%d) stopped scraping', 2)
