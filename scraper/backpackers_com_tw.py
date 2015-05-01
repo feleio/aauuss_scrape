@@ -46,15 +46,18 @@ class Scraper:
                         except Exception, err:
                             logging.error( 'scraper(%d), src(%d), id(%s):\n%s',
                                 self._scraper_id, src_id, self._get_post_id(link), traceback.format_exc())
+                            dbagent.source_error(src_id)
                 else:
                     break
             if ( scape_count > 0 ):
                 logging.info( 'scraper(%d), src(%d): %d posts saved' ,
                             self._scraper_id, src_id, scape_count )
+                dbagent.source_scrape(src_id, scape_count)
 
         except Exception, err:
             logging.error( 'scraper(%d), src(%d):\n%s',
                 self._scraper_id, src_id, traceback.format_exc())
+            dbagent.source_error(src_id)
 
     def _get_post_id(self, url):
         prog = re.compile('^.+=(\d+)$')

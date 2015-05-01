@@ -90,3 +90,28 @@ def get_source_tags(source_id):
 	cursor.execute(sql)
 	results = cursor.fetchall()
 	return [src[0] for src in results]
+
+def source_error(source_id):
+	global cursor
+	sql = "UPDATE sources SET error_count = error_count + 1 WHERE id = %s" 
+
+	try:
+		cursor.execute(sql, source_id)
+		db.commit()
+		return cursor.lastrowid
+	except:
+		db.rollback()
+		raise
+
+def source_scrape(source_id, scrape_count):
+	global cursor
+	sql = "UPDATE sources SET scrape_count = scrape_count + %s WHERE id = %s" 
+	values = ( scrape_count, source_id )
+
+	try:
+		cursor.execute(sql, values)
+		db.commit()
+		return cursor.lastrowid
+	except:
+		db.rollback()
+		raise
