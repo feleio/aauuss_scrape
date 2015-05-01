@@ -16,7 +16,7 @@ while 1:
     for hdlr in log.handlers:  # remove all old handlers
         log.removeHandler(hdlr)
     log.addHandler(fileh)      # set the new handler
-    log.setLevel(logging.INFO)
+    #log.setLevel(logging.INFO)
 
     #scrape
 
