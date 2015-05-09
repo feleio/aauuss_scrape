@@ -1,7 +1,6 @@
 import MySQLdb
 from datetime import datetime
 
-import logger
 import socket
 
 if(socket.gethostname() == "homestead"):
@@ -52,9 +51,12 @@ def add_post(title, content, url, author, sourceId, remote_id, postedAt, ):
 		raise
 
 
-def get_sources(scraper_id):
+def get_sources(scraper_id=0):
 	global cursor
-	sql = "SELECT id, url FROM sources WHERE scraper_id = %d" % scraper_id
+	if(scraper_id==0):
+		sql = "SELECT id, url FROM sources"
+	else:
+		sql = "SELECT id, url FROM sources WHERE scraper_id = %d" % scraper_id
 	cursor.execute(sql)
 	results = cursor.fetchall()
 	return [{'id':src[0],'url':src[1]} for src in results]
@@ -115,3 +117,82 @@ def source_scrape(source_id, scrape_count):
 	except:
 		db.rollback()
 		raise
+
+
+
+def add_run():
+	global cursor
+	sql = 	u"INSERT INTO runs (created_at,updated_at) "\
+			"VALUES (now(),now())"
+
+	try:
+		cursor.execute(sql)
+		db.commit()
+		return cursor.lastrowid
+	except:
+		db.rollback()
+		raise
+
+def prepare_all_scrape(run_id, source_ids):
+	for source_id in source_ids:
+		add_scrape(run_id, source_id)
+
+
+def add_scrape(run_id, source_id, status='pending'):
+	global cursor
+	values = (	run_id, 
+				source_id,
+				status )
+	sql = 	u"INSERT INTO scrapes (run_id,source_id,status,created_at,updated_at) "\
+			"VALUES (%s,%s,%s,now(),now())"
+
+	try:
+		cursor.execute(sql, values)
+		db.commit()
+		return cursor.lastrowid
+	except:
+		db.rollback()
+		raise
+
+def add_log(scrape_id, content):
+	global cursor
+	values = (	unicode(content), 
+				scrape_id )
+	sql = 	u"INSERT INTO logs (content,scrape_id,created_at,updated_at) "\
+			"VALUES (%s,%s,now(),now())"
+
+	try:
+		cursor.execute(sql, values)
+		db.commit()
+		return cursor.lastrowid
+	except:
+		db.rollback()
+		raise
+
+def update_scrape_status(run_id, source_id, status):
+	global cursor
+	sql = "UPDATE scrapes SET status = %s WHERE run_id = %s AND source_id = %s" 
+	values = ( status, run_id, source_id )
+	try:
+		cursor.execute(sql, values)
+		db.commit()
+		return cursor.lastrowid
+	except:
+		db.rollback()
+		raise
+
+def get_scrape_id(run_id, source_id):
+	global cursor
+	sql = 	"SELECT id FROM scrapes WHERE run_id = %s AND source_id = %s"
+	values = (run_id, source_id)
+
+	cursor.execute(sql, values)
+	result = cursor.fetchone()
+	if result and len(result) > 0:
+		return result[0]
+	else:
+		return None
+
+if __name__ == '__main__':
+	print add_scrape(2,2)
+	print get_scrape_id(2,2)

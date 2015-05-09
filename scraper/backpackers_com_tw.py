@@ -15,10 +15,11 @@ class Scraper:
         self._scraper_id = 1
         dbagent.set_time_zone('+00:00')
 
-    def _scrape(self, src_id, src_url):
+    def _scrape(self, run_id, src_id, src_url):
         try:
+            scrape_id = dbagent.get_scrape_id(run_id, src_id)
             logging.debug( 'scraper(%d), src(%d) start:' ,
-                            self._scraper_id, src_id )
+                            self._scraper_id, src_id, extra={'scrape_id':scrape_id})
             xml_doc = url.get(src_url).read().decode('utf-8','ignore')
             soup = BeautifulSoup(xml_doc, "xml")
 
@@ -26,6 +27,7 @@ class Scraper:
             post_id = self._get_post_id(src_url)
 
             scape_count = 0
+            err_count = 0
 
             for item in soup('item'):
                 pub_date = item.pubDate.string
@@ -47,19 +49,27 @@ class Scraper:
                             scape_count += 1
                         except Exception, err:
                             logging.error( 'scraper(%d), src(%d), id(%s):\n%s',
-                                self._scraper_id, src_id, self._get_post_id(link), traceback.format_exc())
+                                self._scraper_id, src_id, self._get_post_id(link), traceback.format_exc(), extra={'scrape_id':scrape_id})
                             dbagent.source_error(src_id)
+                            err_count += 1
+
                 else:
                     break
             if ( scape_count > 0 ):
                 logging.info( 'scraper(%d), src(%d): %d posts saved' ,
-                            self._scraper_id, src_id, scape_count )
+                            self._scraper_id, src_id, scape_count, extra={'scrape_id':scrape_id} )
                 dbagent.source_scrape(src_id, scape_count)
+
+            if (err_count > 0):
+                dbagent.update_scrape_status(run_id, src_id, 'fail')
+            else:
+                dbagent.update_scrape_status(run_id, src_id, 'success')
 
         except Exception, err:
             logging.error( 'scraper(%d), src(%d):\n%s',
-                self._scraper_id, src_id, traceback.format_exc())
+                self._scraper_id, src_id, traceback.format_exc(), extra={'scrape_id':scrape_id})
             dbagent.source_error(src_id)
+            dbagent.update_scrape_status(run_id, src_id, 'fail')
 
     def _get_post_id(self, url):
         prog = re.compile('^.+=(\d+)$')
@@ -71,9 +81,9 @@ class Scraper:
             dbagent.add_post_tag(post_id, tag_id)
 
 
-    def scrape(self):
+    def scrape(self, run_id):
         for src in dbagent.get_sources(self._scraper_id):
-            self._scrape(src['id'], src['url'])
+            self._scrape( run_id, src['id'], src['url'])
 
         #self._scrape(27, 'http://www.backpackers.com.tw/forum/external.php?type=RSS2&amp;forumids=309')
         

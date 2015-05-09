@@ -1,10 +1,30 @@
-import codecs
-from datetime import datetime
+import logging
+from dbLogHandler import dbLogHandler
+import datetime
+import dbagent
 
-log_file_name = 'log/scrapper.log'
+def setupLog(loglevel):
+    numeric_level = getattr(logging, loglevel.upper(), None)
 
-def log(log_type, str):
-	with codecs.open(log_file_name, 'a', encoding='utf8') as log:
-		now_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-		log.write("%s [%s] %s\n" % (now_str, log_type, str))
-		
+    if not isinstance(numeric_level, int):
+        raise ValueError('Invalid log level: %s' % loglevel)
+
+    #setup file logger
+    now = datetime.datetime.utcnow()
+    log_file_name = now.strftime('%Y%m%d')
+
+    fileh = logging.FileHandler('log/%s.log' % log_file_name, 'a')
+    formatter = logging.Formatter('%(asctime)s [%(levelname)s]: %(message)s')
+    fileh.setFormatter(formatter)
+
+    #setup db logger
+    dbh = dbLogHandler()
+
+    log = logging.getLogger()  # root logger
+    for hdlr in log.handlers:  # remove all old handlers
+        log.removeHandler(hdlr)
+
+    log.addHandler(fileh)      # set the new handler
+    log.addHandler(dbh)      # set the new handler
+
+    log.setLevel(numeric_level)
