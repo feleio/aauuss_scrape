@@ -38,7 +38,7 @@ return array(
 	// and store them locally
 	'connections'      => array(
 		'production' => array(
-			'host'      => 'ec2-54-64-231-188.ap-northeast-1.compute.amazonaws.com',
+			'host'      => 'ec2-52-68-44-226.ap-northeast-1.compute.amazonaws.com',
 			'username'  => 'deploy',
 			'password'  => '',
 			'key'       => '/home/vagrant/.ssh/id_rsa_deploy',
